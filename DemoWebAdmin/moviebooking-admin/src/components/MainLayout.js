@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
 import { 
   Box, 
@@ -21,9 +21,24 @@ import {
   Logout as LogoutIcon, 
   Menu as MenuIcon 
 } from '@mui/icons-material';
+import { AuthContext } from '../context/AuthContext';
+import axios from 'axios';
+
+// Thêm interceptor để gửi token trong header
+axios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 const MainLayout = () => {
   const navigate = useNavigate();
+  const { user, logout } = useContext(AuthContext);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const drawerWidth = 240;
@@ -32,10 +47,16 @@ const MainLayout = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
 
-  // Hàm xử lý khi click vào một mục trong sidebar
   const handleMenuItemClick = (path) => {
-    navigate(path); // Điều hướng đến trang tương ứng
-    setIsDrawerOpen(false); // Đóng sidebar
+    navigate(path);
+    setIsDrawerOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    localStorage.removeItem('token');
+    setIsDrawerOpen(false);
+    navigate('/');
   };
 
   return (
@@ -46,14 +67,16 @@ const MainLayout = () => {
             Trang chủ
           </Button>
           <Box sx={{ flexGrow: 1 }} />
-          <IconButton
-            edge="end"
-            color="inherit"
-            onClick={toggleDrawer}
-            sx={{ marginRight: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
+          {user && (
+            <IconButton
+              edge="end"
+              color="inherit"
+              onClick={toggleDrawer}
+              sx={{ marginRight: 2 }}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
         </Toolbar>
       </AppBar>
 
@@ -96,6 +119,12 @@ const MainLayout = () => {
             </ListItemIcon>
             <ListItemText primary="Tài khoản" />
           </ListItem>
+          <ListItem button onClick={() => handleMenuItemClick('/accounts/add')}>
+            <ListItemIcon>
+              <AccountCircle sx={{ color: '#1976d2' }} />
+            </ListItemIcon>
+            <ListItemText primary="Tạo tài khoản" />
+          </ListItem>
           <ListItem button onClick={() => handleMenuItemClick('/movies')}>
             <ListItemIcon>
               <MovieIcon sx={{ color: '#1976d2' }} />
@@ -116,10 +145,7 @@ const MainLayout = () => {
             color="error"
             startIcon={<LogoutIcon />}
             fullWidth
-            onClick={() => {
-              // Chưa có chức năng đăng xuất, chỉ đóng sidebar
-              setIsDrawerOpen(false);
-            }}
+            onClick={handleLogout}
           >
             Đăng xuất
           </Button>

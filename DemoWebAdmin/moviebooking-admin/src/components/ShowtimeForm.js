@@ -144,6 +144,13 @@ const ShowtimeForm = () => {
             <Typography variant="h4" gutterBottom>
                 {id ? 'Edit Showtime' : 'Add Showtime'}
             </Typography>
+            <Button
+                variant="outlined"
+                color="secondary"
+                onClick={() => navigate('/showtimes')}
+                >
+                Cancel
+            </Button>
             {isLoading ? (
                 <CircularProgress />
             ) : (

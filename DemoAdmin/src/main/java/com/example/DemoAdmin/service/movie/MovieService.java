@@ -36,6 +36,7 @@ public class MovieService implements IMovieService {
     public MovieResponse createMovie(MovieRequest request) {
         final Movie movie = new Movie();
         movie.setTitle(request.getTitle());
+        movie.setSlug(generateSlug(request.getTitle()));
         movie.setDescription(request.getDescription());
         movie.setReleaseDate(request.getReleaseDate());
         movie.setDuration(request.getDuration());
@@ -73,6 +74,7 @@ public class MovieService implements IMovieService {
                 .orElseThrow(() -> new RuntimeException("Movie not found"));
 
         movie.setTitle(request.getTitle());
+        movie.setSlug(generateSlug(request.getTitle()));
         movie.setDescription(request.getDescription());
         movie.setReleaseDate(request.getReleaseDate());
         movie.setDuration(request.getDuration());
@@ -129,4 +131,11 @@ public class MovieService implements IMovieService {
         movie.getGenres().clear();
         movieRepository.delete(movie);
     }
+    private String generateSlug(String title) {
+        return title.toLowerCase()
+                .replaceAll("[^a-z0-9\\s]", "") // bỏ ký tự đặc biệt
+                .replaceAll("\\s+", "-")        // khoảng trắng -> dấu -
+                .replaceAll("^-|-$", "");       // bỏ dấu - đầu/cuối
+    }
+
 }

@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import { TextField, Button, Box, Typography, Chip, Autocomplete } from '@mui/material';
+import {
+    TextField, Button, Box, Typography, Chip, Autocomplete
+} from '@mui/material';
 import { toast } from 'react-toastify';
 
 const MovieForm = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+
     const [movie, setMovie] = useState({
         title: '',
         description: '',
@@ -20,24 +23,26 @@ const MovieForm = () => {
         rating: '',
         genreIds: []
     });
+
     const [genres, setGenres] = useState([]);
+    const [directors, setDirectors] = useState([]);
     const [genresLoaded, setGenresLoaded] = useState(false);
 
     useEffect(() => {
+        // Fetch genres
         axios.get('http://localhost:8080/api/admin/genres')
             .then(response => {
-                console.log("Danh sách thể loại từ API /api/admin/genres:", response.data.data);
                 setGenres(response.data.data);
                 setGenresLoaded(true);
                 if (response.data.data.length === 0) {
                     toast.warn('No genres available. Please add some genres first.');
                 }
 
+                // Fetch movie data if editing
                 if (id) {
                     axios.get(`http://localhost:8080/api/admin/movies/${id}`)
                         .then(movieResponse => {
                             const movieData = movieResponse.data.data;
-                            console.log("Dữ liệu phim từ API /api/admin/movies/{id}:", movieData);
                             const formattedReleaseDate = movieData.releaseDate
                                 ? new Date(movieData.releaseDate).toISOString().split('T')[0]
                                 : '';
@@ -62,6 +67,16 @@ const MovieForm = () => {
                 toast.error('Error fetching genres');
                 setGenresLoaded(true);
             });
+
+        // Fetch directors
+        axios.get('http://localhost:8080/api/admin/directors')
+            .then(response => {
+                setDirectors(response.data.data);
+            })
+            .catch(error => {
+                console.error("Lỗi khi lấy danh sách đạo diễn:", error);
+                toast.error('Error fetching directors');
+            });
     }, [id]);
 
     const handleChange = (e) => {
@@ -77,7 +92,7 @@ const MovieForm = () => {
             directorId: parseInt(movie.directorId, 10),
             rating: movie.rating ? parseFloat(movie.rating) : null,
         };
-        console.log("Dữ liệu gửi đi:", movieToSubmit);
+
         const request = id
             ? axios.put(`http://localhost:8080/api/admin/movies/${id}`, movieToSubmit)
             : axios.post('http://localhost:8080/api/admin/movies', movieToSubmit);
@@ -85,7 +100,7 @@ const MovieForm = () => {
         request
             .then(response => {
                 toast.success(response.data.message);
-                navigate('/movies'); // Điều hướng về danh sách phim
+                navigate('/movies');
             })
             .catch(error => {
                 console.error("Lỗi từ backend:", error.response?.data);
@@ -94,10 +109,17 @@ const MovieForm = () => {
     };
 
     return (
-        <Box sx={{ maxWidth: 600, margin: 'auto', padding: 2, height: '100%' }}>
+        <Box sx={{ maxWidth: 600, margin: 'auto', padding: 2 }}>
             <Typography variant="h4" gutterBottom>
                 {id ? 'Edit Movie' : 'Add Movie'}
             </Typography>
+            <Button
+                variant="outlined"
+                color="secondary"
+                onClick={() => navigate('/movies')}
+                >
+                 Cancel
+             </Button>
             <form onSubmit={handleSubmit}>
                 <TextField
                     label="Title"
@@ -140,15 +162,22 @@ const MovieForm = () => {
                     margin="normal"
                     required
                 />
-                <TextField
-                    label="Director ID"
-                    name="directorId"
-                    type="number"
-                    value={movie.directorId}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="normal"
-                    required
+                <Autocomplete
+                    options={directors}
+                    getOptionLabel={(option) => option.name}
+                    value={directors.find(d => d.id === parseInt(movie.directorId)) || null}
+                    onChange={(event, newValue) => {
+                        setMovie({ ...movie, directorId: newValue ? String(newValue.id) : '' });
+                    }}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            label="Director"
+                            margin="normal"
+                            required
+                            fullWidth
+                        />
+                    )}
                 />
                 <TextField
                     label="Trailer URL"
@@ -201,7 +230,6 @@ const MovieForm = () => {
                         value={genres.filter(genre => (movie.genreIds || []).includes(genre.id))}
                         onChange={(event, newValue) => {
                             const newGenreIds = newValue.map(genre => genre.id);
-                            console.log("Thể loại đã chọn (genreIds):", newGenreIds);
                             setMovie({ ...movie, genreIds: newGenreIds });
                         }}
                         renderInput={(params) => (

@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Typography, CircularProgress } from '@mui/material';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    Button,
+    Typography,
+    CircularProgress
+} from '@mui/material';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -57,6 +68,8 @@ const ShowtimeList = () => {
                             <TableRow>
                                 <TableCell>ID</TableCell>
                                 <TableCell>Movie</TableCell>
+                                <TableCell>Theater</TableCell>
+                                <TableCell>Screen</TableCell>
                                 <TableCell>Start Time</TableCell>
                                 <TableCell>End Time</TableCell>
                                 <TableCell>Actions</TableCell>
@@ -67,6 +80,8 @@ const ShowtimeList = () => {
                                 <TableRow key={showtime.id}>
                                     <TableCell>{showtime.id}</TableCell>
                                     <TableCell>{showtime.movieTitle}</TableCell>
+                                    <TableCell>{showtime.theaterName}</TableCell>
+                                    <TableCell>{showtime.screenNumber}</TableCell>
                                     <TableCell>{new Date(showtime.startTime).toLocaleString()}</TableCell>
                                     <TableCell>{new Date(showtime.endTime).toLocaleString()}</TableCell>
                                     <TableCell>

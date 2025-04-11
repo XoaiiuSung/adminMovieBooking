@@ -65,6 +65,11 @@ public class Movie {
     @Column(name = "PosterUrl", length = 200)
     private String posterUrl;
 
+    @Size(max = 200)
+    @Nationalized
+    @Column(name = "Slug", length = 200, unique = true)
+    private String slug;
+
     @Column(name = "rating")
     private Double rating;
 
