@@ -9,10 +9,13 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface IShowtimeMapper {
     @Mapping(target = "movie.id", source = "movieId")
-    @Mapping(target = "theater.id", source = "theaterId")
+    @Mapping(target = "screen.id", source = "screenId")
     Showtime toShowtime(ShowtimeRequest request);
 
+    @Mapping(target = "movieId", source = "movie.id") // Thêm ánh xạ cho movieId
+    @Mapping(target = "screenId", source = "screen.id") // Thêm ánh xạ cho screenId
     @Mapping(target = "movieTitle", source = "movie.title")
-    @Mapping(target = "theaterName", source = "theater.name")
+    @Mapping(target = "screenNumber", source = "screen.screenNumber")
+    @Mapping(target = "theaterName", source = "screen.theater.name")
     ShowtimeResponse toShowtimeResponse(Showtime showtime);
 }

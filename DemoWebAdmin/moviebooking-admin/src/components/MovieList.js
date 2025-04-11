@@ -25,7 +25,7 @@ const MovieList = () => {
     };
 
     return (
-        <div>
+        <div style={{ padding: '20px', height: '100%' }}>
             <Typography variant="h4" gutterBottom>
                 Movie List
             </Typography>
@@ -33,7 +33,7 @@ const MovieList = () => {
                 variant="contained"
                 color="primary"
                 component={Link}
-                to="/add"
+                to="/movies/add"
                 style={{ marginBottom: '20px' }}
             >
                 Add New Movie
@@ -71,7 +71,7 @@ const MovieList = () => {
                                         variant="outlined"
                                         color="primary"
                                         component={Link}
-                                        to={`/edit/${movie.id}`}
+                                        to={`/movies/edit/${movie.id}`}
                                         style={{ marginRight: '10px' }}
                                     >
                                         Edit

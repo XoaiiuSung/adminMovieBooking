@@ -1,32 +1,43 @@
 package com.example.DemoAdmin.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
+@Getter
+@Setter
+@ToString
 @Entity
-@Table(name = "showtimes")
-@Data
+@Table(name = "Showtime")
 public class Showtime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ShowtimeId", nullable = false)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "movie_id", nullable = false)
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "MovieId", nullable = false)
     private Movie movie;
 
-    @ManyToOne
-    @JoinColumn(name = "theater_id", nullable = false)
-    private Theater theater;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "ScreenId", nullable = false)
+    private Screen screen;
 
-    @Column(name = "start_time", nullable = false)
-    private LocalDateTime startTime;
+    @NotNull
+    @Column(name = "StartTime", nullable = false)
+    private Instant startTime;
 
-    @Column(name = "end_time", nullable = false)
-    private LocalDateTime endTime;
-
-    @Column(name = "price", nullable = false)
-    private Double price;
+    @NotNull
+    @Column(name = "EndTime", nullable = false)
+    private Instant endTime;
 }

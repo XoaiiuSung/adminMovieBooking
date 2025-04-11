@@ -20,12 +20,10 @@ const MovieForm = () => {
         rating: '',
         genreIds: []
     });
-    const [genres, setGenres] = useState([]); // Danh sách thể loại để chọn
-    const [genresLoaded, setGenresLoaded] = useState(false); // Trạng thái tải genres
+    const [genres, setGenres] = useState([]);
+    const [genresLoaded, setGenresLoaded] = useState(false);
 
-    // Lấy danh sách thể loại trước, sau đó lấy dữ liệu phim
     useEffect(() => {
-        // Lấy danh sách thể loại
         axios.get('http://localhost:8080/api/admin/genres')
             .then(response => {
                 console.log("Danh sách thể loại từ API /api/admin/genres:", response.data.data);
@@ -35,7 +33,6 @@ const MovieForm = () => {
                     toast.warn('No genres available. Please add some genres first.');
                 }
 
-                // Sau khi lấy genres, lấy dữ liệu phim (nếu có id)
                 if (id) {
                     axios.get(`http://localhost:8080/api/admin/movies/${id}`)
                         .then(movieResponse => {
@@ -51,7 +48,7 @@ const MovieForm = () => {
                                 ...movieData,
                                 releaseDate: formattedReleaseDate,
                                 genreIds: genreIdsArray,
-                                directorId: movieData.directorId ? String(movieData.directorId) : '', // Chuyển directorId thành string
+                                directorId: movieData.directorId ? String(movieData.directorId) : '',
                             });
                         })
                         .catch(error => {
@@ -74,7 +71,6 @@ const MovieForm = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Chuyển đổi kiểu dữ liệu trước khi gửi
         const movieToSubmit = {
             ...movie,
             duration: parseInt(movie.duration, 10),
@@ -89,7 +85,7 @@ const MovieForm = () => {
         request
             .then(response => {
                 toast.success(response.data.message);
-                navigate('/');
+                navigate('/movies'); // Điều hướng về danh sách phim
             })
             .catch(error => {
                 console.error("Lỗi từ backend:", error.response?.data);
@@ -98,7 +94,7 @@ const MovieForm = () => {
     };
 
     return (
-        <Box sx={{ maxWidth: 600, margin: 'auto', padding: 2 }}>
+        <Box sx={{ maxWidth: 600, margin: 'auto', padding: 2, height: '100%' }}>
             <Typography variant="h4" gutterBottom>
                 {id ? 'Edit Movie' : 'Add Movie'}
             </Typography>

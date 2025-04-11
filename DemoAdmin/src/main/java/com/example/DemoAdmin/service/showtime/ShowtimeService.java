@@ -3,10 +3,12 @@ package com.example.DemoAdmin.service.showtime;
 import com.example.DemoAdmin.dto.request.ShowtimeRequest;
 import com.example.DemoAdmin.dto.response.ShowtimeResponse;
 import com.example.DemoAdmin.entity.Movie;
+import com.example.DemoAdmin.entity.Screen;
 import com.example.DemoAdmin.entity.Showtime;
 import com.example.DemoAdmin.entity.Theater;
 import com.example.DemoAdmin.mapper.IShowtimeMapper;
 import com.example.DemoAdmin.repository.IMovieRepository;
+import com.example.DemoAdmin.repository.IScreenRepository;
 import com.example.DemoAdmin.repository.IShowtimeRepository;
 import com.example.DemoAdmin.repository.ITheaterRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,21 +23,21 @@ public class ShowtimeService {
 
     private final IShowtimeRepository showtimeRepository;
     private final IMovieRepository movieRepository;
-    private final ITheaterRepository theaterRepository;
+    private final IScreenRepository screenRepository;
     private final IShowtimeMapper showtimeMapper;
 
     // Tạo suất chiếu mới
     public ShowtimeResponse createShowtime(ShowtimeRequest request) {
-        // Kiểm tra movieId và theaterId có tồn tại không
+        // Kiểm tra movieId và screenId có tồn tại không
         Movie movie = movieRepository.findById(request.getMovieId())
                 .orElseThrow(() -> new RuntimeException("Movie not found with id: " + request.getMovieId()));
-        Theater theater = theaterRepository.findById(request.getTheaterId())
-                .orElseThrow(() -> new RuntimeException("Theater not found with id: " + request.getTheaterId()));
+        Screen screen = screenRepository.findById(request.getScreenId())
+                .orElseThrow(() -> new RuntimeException("Screen not found with id: " + request.getScreenId()));
 
         // Chuyển từ ShowtimeRequest sang Showtime entity
         Showtime showtime = showtimeMapper.toShowtime(request);
         showtime.setMovie(movie);
-        showtime.setTheater(theater);
+        showtime.setScreen(screen);
 
         // Lưu vào database
         Showtime savedShowtime = showtimeRepository.save(showtime);
@@ -64,18 +66,17 @@ public class ShowtimeService {
         Showtime showtime = showtimeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Showtime not found with id: " + id));
 
-        // Kiểm tra movieId và theaterId
+        // Kiểm tra movieId và screenId
         Movie movie = movieRepository.findById(request.getMovieId())
                 .orElseThrow(() -> new RuntimeException("Movie not found with id: " + request.getMovieId()));
-        Theater theater = theaterRepository.findById(request.getTheaterId())
-                .orElseThrow(() -> new RuntimeException("Theater not found with id: " + request.getTheaterId()));
+        Screen screen = screenRepository.findById(request.getScreenId())
+                .orElseThrow(() -> new RuntimeException("Screen not found with id: " + request.getScreenId()));
 
         // Cập nhật thông tin suất chiếu
         showtime.setMovie(movie);
-        showtime.setTheater(theater);
+        showtime.setScreen(screen);
         showtime.setStartTime(request.getStartTime());
         showtime.setEndTime(request.getEndTime());
-        showtime.setPrice(request.getPrice());
 
         // Lưu vào database
         Showtime updatedShowtime = showtimeRepository.save(showtime);
